@@ -14,6 +14,7 @@ import com.shipkart.Shipkart.JwtUtil.JwtUtil;
 import com.shipkart.Shipkart.Repo.UserRepository;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Optional;
 
@@ -56,8 +57,15 @@ public class AuthController {
 
     
     @PostMapping("/signout")
-    public ResponseEntity<String> signout() {
-        // Logout is handled client-side by deleting the JWT token.
+    public ResponseEntity<String> signout(HttpServletRequest request) {
+    	
+    	String token = null;
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7); // Extract the token part after "Bearer "
+        }
+    	jwtUtil.blacklistToken(token);
         return ResponseEntity.ok("User signed out successfully!");
     }
     

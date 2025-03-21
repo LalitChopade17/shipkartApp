@@ -42,6 +42,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwtToken = authHeader.substring(7);
+        
+        if (jwtService.isTokenBlacklisted(jwtToken)) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is blacklisted");
+            return;
+        }
+        
+        if (jwtService.isTokenExpired(jwtToken)) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is expired");
+            return;
+        }
+        
+        
+        
         try {
             username = jwtService.extractUsername(jwtToken);
         } catch (ExpiredJwtException e) {
